@@ -47,7 +47,7 @@ static inline float border_radius_clamp(CGRect frame, float radius, int width)
     return radius;
 }
 
-void border_window_refresh(struct window *window)
+void border_window_refresh(struct window *window, bool fill)
 {
     if (!window->border.id) return;
     struct border *border = &window->border;
@@ -81,7 +81,14 @@ void border_window_refresh(struct window *window)
     CGContextClearRect(border->context, clear_region);
 
     CGContextAddPath(border->context, path);
-    CGContextStrokePath(border->context);
+
+    if (fill) {
+        border->fill = rgba_color_from_hex(g_window_manager.normal_window_fill_color);
+        CGContextSetRGBFillColor(border->context, border->fill.r, border->fill.g, border->fill.b, border->fill.a);
+        CGContextDrawPath(border->context, kCGPathFillStroke);
+    } else {
+        CGContextStrokePath(border->context);
+    }
 
     CGContextFlush(border->context);
     SLSOrderWindow(g_connection, border->id, 1, window->id);
@@ -103,7 +110,7 @@ void border_window_activate(struct window *window)
     if (window_is_fullscreen(window)) {
         border_window_hide(window);
     } else {
-        border_window_refresh(window);
+        border_window_refresh(window, 0);
     }
 }
 
@@ -119,7 +126,7 @@ void border_window_deactivate(struct window *window)
     if (window_is_fullscreen(window)) {
         border_window_hide(window);
     } else {
-        border_window_refresh(window);
+        border_window_refresh(window, 1);
     }
 }
 

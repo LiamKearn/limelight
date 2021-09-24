@@ -39,11 +39,12 @@ struct border
     int width;
     float radius;
     struct rgba_color color;
+    struct rgba_color fill;
 };
 
 struct window;
 
-void border_window_refresh(struct window *window);
+void border_window_refresh(struct window *window, bool fill);
 void border_window_activate(struct window *window);
 void border_window_deactivate(struct window *window);
 void border_window_show(struct window *window);
