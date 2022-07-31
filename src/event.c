@@ -366,7 +366,7 @@ static EVENT_CALLBACK(EVENT_HANDLER_WINDOW_MOVED)
 
     if (window->application->is_hidden) return EVENT_SUCCESS;
 
-    if (!window->is_fullscreen) border_window_refresh(window);
+    if (!window->is_fullscreen) border_window_refresh(window, window->id != g_window_manager.focused_window_id);
 
     debug("%s: %s %d\n", __FUNCTION__, window->application->name, window->id);
 
@@ -411,7 +411,7 @@ static EVENT_CALLBACK(EVENT_HANDLER_WINDOW_RESIZED)
 
     window->is_fullscreen = is_fullscreen;
 
-    if (!window->is_fullscreen) border_window_refresh(window);
+    if (!window->is_fullscreen) border_window_refresh(window, window->id != g_window_manager.focused_window_id);
 
     return EVENT_SUCCESS;
 }

@@ -28,7 +28,7 @@ void window_manager_set_border_window_width(struct window_manager *wm, int width
                     if ((!window->application->is_hidden) &&
                         (!window->is_minimized) &&
                         (!window->is_fullscreen)) {
-                        border_window_refresh(window);
+                        border_window_refresh(window, window->id != wm->focused_window_id);
                     }
                 }
             }
@@ -52,7 +52,7 @@ void window_manager_set_border_window_radius(struct window_manager *wm, float ra
                     if ((!window->application->is_hidden) &&
                         (!window->is_minimized) &&
                         (!window->is_fullscreen)) {
-                        border_window_refresh(window);
+                        border_window_refresh(window, window->id != wm->focused_window_id);
                     }
                 }
             }
@@ -72,6 +72,28 @@ void window_manager_set_active_border_window_color(struct window_manager *wm, ui
 void window_manager_set_normal_border_window_color(struct window_manager *wm, uint32_t color)
 {
     wm->normal_window_border_color = color;
+    for (int window_index = 0; window_index < wm->window.capacity; ++window_index) {
+        struct bucket *bucket = wm->window.buckets[window_index];
+        while (bucket) {
+            if (bucket->value) {
+                struct window *window = bucket->value;
+                if (window->id != wm->focused_window_id) {
+                    if ((!window->application->is_hidden) &&
+                        (!window->is_minimized) &&
+                        (!window->is_fullscreen)) {
+                        border_window_deactivate(window);
+                    }
+                }
+            }
+
+            bucket = bucket->next;
+        }
+    }
+}
+
+void window_manager_set_normal_fill_window_color(struct window_manager *wm, uint32_t color)
+{
+    wm->normal_window_fill_color = color;
     for (int window_index = 0; window_index < wm->window.capacity; ++window_index) {
         struct bucket *bucket = wm->window.buckets[window_index];
         while (bucket) {

@@ -20,6 +20,7 @@ struct window_manager
     float window_border_radius;
     uint32_t active_window_border_color;
     uint32_t normal_window_border_color;
+    uint32_t normal_window_fill_color;
     enum border_placement window_border_placement;
 };
 
@@ -27,6 +28,7 @@ void window_manager_set_border_window_width(struct window_manager *wm, int width
 void window_manager_set_border_window_radius(struct window_manager *wm, float radius);
 void window_manager_set_active_border_window_color(struct window_manager *wm, uint32_t color);
 void window_manager_set_normal_border_window_color(struct window_manager *wm, uint32_t color);
+void window_manager_set_normal_fill_window_color(struct window_manager *wm, uint32_t color);
 struct window *window_manager_focused_window(struct window_manager *wm);
 struct application *window_manager_focused_application(struct window_manager *wm);
 bool window_manager_find_lost_front_switched_event(struct window_manager *wm, pid_t pid);

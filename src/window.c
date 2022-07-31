@@ -350,7 +350,7 @@ struct window *window_create(struct application *application, AXUIElementRef win
         if ((!window->application->is_hidden) &&
             (!window->is_minimized) &&
             (!window->is_fullscreen)) {
-            border_window_refresh(window);
+            border_window_refresh(window, window->id != g_window_manager.focused_window_id);
         }
     }
 

@@ -8,11 +8,12 @@ extern bool g_verbose;
 
 /* --------------------------------DOMAIN CONFIG-------------------------------- */
 #define COMMAND_CONFIG_DEBUG_OUTPUT          "debug_output"
-#define COMMAND_CONFIG_BORDER_WIDTH          "width"
-#define COMMAND_CONFIG_BORDER_RADIUS         "radius"
-#define COMMAND_CONFIG_BORDER_ACTIVE_COLOR   "active_color"
-#define COMMAND_CONFIG_BORDER_NORMAL_COLOR   "normal_color"
-#define COMMAND_CONFIG_BORDER_PLACEMENT      "placement"
+#define COMMAND_CONFIG_BORDER_WIDTH          "border_width"
+#define COMMAND_CONFIG_BORDER_RADIUS         "border_radius"
+#define COMMAND_CONFIG_BORDER_ACTIVE_COLOR   "active_border_color"
+#define COMMAND_CONFIG_BORDER_NORMAL_COLOR   "normal_border_color"
+#define COMMAND_CONFIG_FILL_NORMAL_COLOR     "normal_fill_color"
+#define COMMAND_CONFIG_BORDER_PLACEMENT      "border_placement"
 
 #define ARGUMENT_CONFIG_BORDER_PLACEMENT_EXT "exterior"
 #define ARGUMENT_CONFIG_BORDER_PLACEMENT_INT "interior"
@@ -38,16 +39,6 @@ static bool token_equals(struct token token, char *match)
 static bool token_is_valid(struct token token)
 {
     return token.text && token.length > 0;
-}
-
-static char *token_to_string(struct token token)
-{
-    char *result = malloc(token.length + 1);
-    if (!result) return NULL;
-
-    memcpy(result, token.text, token.length);
-    result[token.length] = '\0';
-    return result;
 }
 
 static uint32_t token_to_uint32t(struct token token)
@@ -170,6 +161,18 @@ static void handle_domain_config(FILE *rsp, struct token domain, char *message)
             uint32_t color = token_to_uint32t(value);
             if (color) {
                 window_manager_set_normal_border_window_color(&g_window_manager, color);
+            } else {
+                daemon_fail(rsp, "unknown value '%.*s' given to command '%.*s' for domain '%.*s'\n", value.length, value.text, command.length, command.text, domain.length, domain.text);
+            }
+        }
+    } else if (token_equals(command, COMMAND_CONFIG_FILL_NORMAL_COLOR)) {
+        struct token value = get_token(&message);
+        if (!token_is_valid(value)) {
+            fprintf(rsp, "0x%x\n", g_window_manager.normal_window_fill_color);
+        } else {
+            uint32_t color = token_to_uint32t(value);
+            if (color) {
+                window_manager_set_normal_fill_window_color(&g_window_manager, color);
             } else {
                 daemon_fail(rsp, "unknown value '%.*s' given to command '%.*s' for domain '%.*s'\n", value.length, value.text, command.length, command.text, domain.length, domain.text);
             }
